@@ -15,7 +15,7 @@ import Habits from "./pages/Habits";
 function App() {
   return (
     <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter  basename="/habit-front">
           <Routes>      
             {/* routes public */}
             <Route path="/login" element={<Login />} />
