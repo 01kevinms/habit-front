@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [react()],
   base: '/habit-front/', 
   build: {
-    outDir: 'dist'
+    outDir: 'docs'
   }
 })
