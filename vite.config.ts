@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
-// Troque "portf" pelo nome do seu repositório no GitHub
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), 
+    tailwindcss()
+  ],
   base: '/habit-front/', 
   build: {
     outDir: 'docs'
