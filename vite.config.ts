@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [react(), 
     tailwindcss()
   ],
-  base: '/habit-front/', 
+  base:  "/habit-front/", 
   build: {
-    outDir: 'docs'
+    outDir: "docs",
   }
 })
