@@ -1,4 +1,4 @@
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./services/AuthContext";
 import PrivateRoute from "./services/PrivateRoute";
 
@@ -12,11 +12,10 @@ import Habits from "./pages/Habits";
 
 
 
-
 function App() {
   return (
     <AuthProvider>
-        <HashRouter>
+        <BrowserRouter  basename="/habit-front">
           <Routes>      
             {/* routes public */}
             <Route path="/login" element={<Login />} />
@@ -32,7 +31,7 @@ function App() {
             </Route>
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
-        </HashRouter>
+        </BrowserRouter>
     </AuthProvider>
   );
 }
