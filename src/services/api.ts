@@ -1,7 +1,7 @@
 // ./services/api.ts
 import type { NewHabit, Habit } from "../hooks/useHabits";
 
-const API_URL = (import.meta.env?.VITE_API_URL as string) ?? "https://habit-back.onrender.com";
+const API_URL = (import.meta.env?.VITE_API_URL as string);
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text();
