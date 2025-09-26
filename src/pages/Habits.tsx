@@ -7,7 +7,9 @@ export default function Habits() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [frequency, setFrequency] = useState("daily");
+  const [frequency, setFrequency] = useState<"daily" | "weekly" | "monthly">(
+    "daily"
+  );
 
   const [habitToDelete, setHabitToDelete] = useState<string | null>(null);
 
@@ -58,7 +60,9 @@ export default function Habits() {
           />
           <select
             value={frequency}
-            onChange={(e) => setFrequency(e.target.value)}
+            onChange={(e) =>
+              setFrequency(e.target.value as "daily" | "weekly" | "monthly")
+            }
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
           >
             <option value="daily">Diário</option>
@@ -100,17 +104,16 @@ export default function Habits() {
             </div>
 
             {/* Botão de marcar feito */}
-           <button
-  onClick={() => toggle.mutate(habit.id)}
-  className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
-    habit.todayStatus
-      ? "bg-green-500 hover:bg-green-600"
-      : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400"
-  }`}
->
-  {habit.todayStatus ? "Feito" : "Marcar"}
-</button>
-
+            <button
+              onClick={() => toggle.mutate(habit.id)}
+              className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
+                habit.todayStatus
+                  ? "bg-green-500 hover:bg-green-600"
+                  : "bg-blue-500 hover:bg-blue-600"
+              }`}
+            >
+              {habit.todayStatus ? "Feito" : "Marcar"}
+            </button>
 
             {/* Botão excluir */}
             <button
