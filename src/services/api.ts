@@ -1,15 +1,13 @@
-// ./services/api.ts
-import type { NewHabit, Habit } from "../hooks/useHabits";
 
-const API_URL = (import.meta.env?.VITE_API_URL as string);
+import type { NewHabit, Habit, ToggleResponse } from "../hooks/useHabits";
+const API_URL = import.meta.env?.VITE_API_URL as string;
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text();
   let data: any = null;
   try {
     data = text ? JSON.parse(text) : null;
-  } catch (e) {
-    // não é JSON
+  } catch {
     data = text;
   }
 
@@ -30,7 +28,6 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return data as T;
 }
 
-// ---------------- Helper para requisições autenticadas ----------------
 export async function apiFetch<T = any>(
   path: string,
   options: RequestInit = {},
@@ -54,14 +51,7 @@ export async function apiFetch<T = any>(
     ...options,
     headers,
   });
-if (authToken) {
-  headers["Authorization"] = `Bearer ${authToken}`;
-}
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || "API Error: " + res.statusText);
-  }
   return handleResponse<T>(res);
 }
 
@@ -81,11 +71,15 @@ export async function registerUser(name: string, email: string, password: string
 }
 
 // ---------------- HABITS ----------------
-export async function getHabits(token?: string) {
-  return apiFetch<Habit[]>("/api/habit", { method: "GET" }, token);
+export async function getHabits(token?: string): Promise<Habit[]> {
+  const raw = await apiFetch<any[]>("/api/habit", { method: "GET" }, token);
+  return raw.map((h) => ({
+    ...h,
+    todayStatus: Boolean(h.todayStatus),
+  }));
 }
 
-export async function createHabit(habit: NewHabit, token?: string) {
+export async function createHabitApi(habit: NewHabit, token?: string) {
   return apiFetch<Habit>(
     "/api/habit",
     {
@@ -96,15 +90,30 @@ export async function createHabit(habit: NewHabit, token?: string) {
   );
 }
 
-export async function deleteHabit(id: string, token?: string) {
+export async function deleteHabitApi(id: string, token?: string) {
   return apiFetch<void>(`/api/habit/${id}`, { method: "DELETE" }, token);
 }
 
-export async function toggleHabitLog(id: string, token?: string) {
-  return apiFetch<Habit>(`/api/habit/${id}/logs/toggle`, { method: "POST" }, token);
+export async function toggleHabitLog(
+  id: string,
+  token?: string
+): Promise<ToggleResponse> {
+  return apiFetch<ToggleResponse>(
+    `/api/habit/${id}/logs/toggle`,
+    { method: "POST" },
+    token
+  );
 }
 
-// === STATS ===
+// ---------------- STATS ----------------
+export async function getDailyStats(token: string) {
+  return apiFetch<{
+    completedToday: number;
+    totalHabits: number;
+    percent: number;
+  }>("/api/stat/daily", { method: "GET" }, token);
+}
+
 export async function getWeeklyStats(token?: string) {
   return apiFetch<{ day: string; percent: number }[]>(
     "/api/stat/weekly",

@@ -1,5 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getHabits, createHabit, toggleHabitLog, deleteHabit } from "../services/api";
+import {
+  getHabits,
+  createHabitApi,
+  deleteHabitApi,
+  toggleHabitLog,
+} from "../services/api";
 import { useAuth } from "../services/AuthContext";
 
 export interface Habit {
@@ -7,63 +12,81 @@ export interface Habit {
   title: string;
   description?: string;
   frequency: string;
-  todayStatus: boolean;
+  todayStatus?: boolean; // simplificado: true = feito, false = não feito
 }
 
-export interface NewHabit {
-  title: string;
-  description?: string;
-  frequency: string;
+export type NewHabit = Omit<Habit, "id" | "todayStatus">;
+
+export interface DailyStats {
+  completedToday: number;
+  totalHabits: number;
+  percentage: number;
+}
+
+export interface ToggleResponse {
+  habit: Habit;
+  stats: DailyStats;
 }
 
 export function useHabits() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  // 1️⃣ Buscar hábitos
-  const { data: habits = [], isLoading } = useQuery<Habit[]>({
+  // Helper: invalida todas as queries de stats
+  const invalidateStats = () => {
+    queryClient.invalidateQueries({ queryKey: ["dailyStats"] });
+    queryClient.invalidateQueries({ queryKey: ["weeklyStats"] });
+    queryClient.invalidateQueries({ queryKey: ["monthlyStats"] });
+    queryClient.invalidateQueries({ queryKey: ["streak"] });
+  };
+
+  // Lista de hábitos
+  const { data: habits = [], isLoading } = useQuery({
     queryKey: ["habits"],
-    queryFn: () => {
-      if (!token) return Promise.resolve([]);
-      return getHabits(token);
-    },
+    queryFn: () => getHabits(token!),
     enabled: !!token,
   });
 
-  // 2️⃣ Criar hábito
-  const create = useMutation({
-    mutationFn: (newHabit: NewHabit) => {
-      if (!token) throw new Error("Usuário não autenticado");
-      return createHabit(newHabit, token);
-    },
-    onSuccess: (habit: Habit) => {
-      queryClient.setQueryData<Habit[]>(["habits"], (old) => (old ? [...old, habit] : [habit]));
+  // Criar hábito
+  const createHabit = useMutation({
+    mutationFn: (habit: NewHabit) => createHabitApi(habit, token!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      invalidateStats();
     },
   });
 
-  // 3️⃣ Alternar status de hoje
+  // Excluir hábito
+  const deleteHabit = useMutation({
+    mutationFn: (id: string) => deleteHabitApi(id, token!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
+      invalidateStats();
+    },
+  });
+
+  // Alternar hábito do dia
   const toggle = useMutation({
-    mutationFn: (id: string) => {
-      if (!token) throw new Error("Usuário não autenticado");
-      return toggleHabitLog(id, token);
-    },
-    onSuccess: (updatedHabit: Habit) => {
+    mutationFn: (id: string) => toggleHabitLog(id, token!),
+    onSuccess: (updated) => {
+      // Atualiza cache local de habits
       queryClient.setQueryData<Habit[]>(["habits"], (old) =>
-        old ? old.map((h) => (h.id === updatedHabit.id ? updatedHabit : h)) : []
+        old ? old.map((h) => (h.id === updated.habit.id ? updated.habit : h)) : []
       );
-    },
-  });
-    const remove = useMutation({
-    mutationFn: (id: string) => {
-      if (!token) throw new Error("Usuário não autenticado");
-      return deleteHabit(id, token);
-    },
-    onSuccess: (_, id) => {
-      queryClient.setQueryData<Habit[]>(["habits"], (old) =>
-        old ? old.filter((h) => h.id !== id) : []
-      );
+
+      // Atualiza cache local do dailyStats com a resposta da API
+      queryClient.setQueryData(["dailyStats"], updated.stats);
+
+      // Atualiza todos os outros stats
+      invalidateStats();
     },
   });
 
-  return { habits, isLoading, deleteHabit:remove, createHabit: create, toggleHabit: toggle };
+  return {
+    habits,
+    isLoading,
+    createHabit,
+    deleteHabit,
+    toggle,
+  };
 }

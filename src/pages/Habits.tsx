@@ -3,7 +3,7 @@ import { useHabits, type NewHabit } from "../hooks/useHabits";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Habits() {
-  const { habits, isLoading, createHabit, toggleHabit: toggle, deleteHabit } = useHabits();
+  const { habits, isLoading, createHabit, toggle, deleteHabit } = useHabits();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -86,7 +86,9 @@ export default function Habits() {
             <div>
               <h3 className="text-lg font-bold mb-2">{habit.title}</h3>
               {habit.description && (
-                <p className="text-gray-600 dark:text-gray-400 mb-2">{habit.description}</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  {habit.description}
+                </p>
               )}
               <span
                 className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ${frequencyColor(
@@ -97,17 +99,20 @@ export default function Habits() {
               </span>
             </div>
 
-            <button
-              onClick={() => toggle.mutate(habit.id)}
-              className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
-                habit.todayStatus
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400"
-              }`}
-            >
-              {habit.todayStatus ? "Feito" : "Marcar"}
-            </button>
+            {/* Botão de marcar feito */}
+           <button
+  onClick={() => toggle.mutate(habit.id)}
+  className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
+    habit.todayStatus
+      ? "bg-green-500 hover:bg-green-600"
+      : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400"
+  }`}
+>
+  {habit.todayStatus ? "Feito" : "Marcar"}
+</button>
 
+
+            {/* Botão excluir */}
             <button
               onClick={() => setHabitToDelete(habit.id)}
               className="mt-2 px-3 py-1 rounded text-sm bg-red-500 text-white hover:bg-red-600"

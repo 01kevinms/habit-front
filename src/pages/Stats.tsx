@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { getWeeklyStats, getMonthlyStats, getStreak } from "../services/api";
+import {
+  getWeeklyStats,
+  getMonthlyStats,
+  getDailyStats,
+  getStreak,
+} from "../services/api";
 import { useAuth } from "../services/AuthContext";
 import {
   BarChart,
@@ -13,8 +18,15 @@ import {
   Line,
 } from "recharts";
 
-export default function Status() {
+export default function Stats() {
   const { token } = useAuth();
+
+  const { data: daily } = useQuery({
+    queryKey: ["dailyStats"],
+    queryFn: () => getDailyStats(token!),
+    enabled: !!token,
+  });
+
 
   const { data: weekly = [] } = useQuery({
     queryKey: ["weeklyStats"],
@@ -38,6 +50,19 @@ export default function Status() {
     <div className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 dark:text-gray-200 min-h-screen">
       <h1 className="text-3xl font-bold text-center">📊 Status dos Hábitos</h1>
 
+      {/* Progresso Diário */}
+      {daily && (
+        <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
+          <h2 className="text-xl font-semibold mb-4">Progresso Diário</h2>
+          <p className="text-lg">
+            <span className="font-bold">{daily.completedToday}</span> de{" "}
+            <span className="font-bold">{daily.totalHabits}</span> hábitos (
+            <span className="font-bold">{daily.percent}%</span>)
+          </p>
+        </section>
+      )}
+
+      {/* Progresso Semanal */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Semanal</h2>
         <ResponsiveContainer width="100%" height={250}>
@@ -51,6 +76,7 @@ export default function Status() {
         </ResponsiveContainer>
       </section>
 
+      {/* Progresso Mensal */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Mensal</h2>
         <ResponsiveContainer width="100%" height={250}>
@@ -70,6 +96,7 @@ export default function Status() {
         </ResponsiveContainer>
       </section>
 
+      {/* Streaks */}
       {streak && (
         <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 text-center">
           <h2 className="text-xl font-semibold mb-4">🔥 Séries (Streaks)</h2>
