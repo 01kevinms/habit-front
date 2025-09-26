@@ -20,7 +20,7 @@ export type NewHabit = Omit<Habit, "id" | "todayStatus">;
 export interface DailyStats {
   completedToday: number;
   totalHabits: number;
-  percentage: number;
+  percent: number; 
 }
 
 export interface ToggleResponse {

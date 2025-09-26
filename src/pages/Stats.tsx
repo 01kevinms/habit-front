@@ -27,7 +27,6 @@ export default function Stats() {
     enabled: !!token,
   });
 
-
   const { data: weekly = [] } = useQuery({
     queryKey: ["weeklyStats"],
     queryFn: () => getWeeklyStats(token!),
