@@ -6,33 +6,21 @@ import {
   toggleHabitLog,
 } from "../services/api";
 import { useAuth } from "../services/AuthContext";
-
-export interface Habit {
-  id: string;
-  title: string;
-  description?: string;
-  frequency: string;
-  todayStatus?: boolean; // simplificado: true = feito, false = não feito
-}
-
-export type NewHabit = Omit<Habit, "id" | "todayStatus">;
-
-export interface DailyStats {
-  completedToday: number;
-  totalHabits: number;
-  percent: number; 
-}
-
-export interface ToggleResponse {
-  habit: Habit;
-  stats: DailyStats;
-}
+import type { Habit, NewHabit, ToggleResponse } from "../types/typehabits";
 
 export function useHabits() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  // Helper: invalida todas as queries de stats
+  // Busca hábitos (usa todayStatus direto do backend)
+  const { data: habits = [], isLoading } = useQuery<Habit[]>({
+    queryKey: ["habits"],
+    queryFn: () => getHabits(token!),
+    enabled: !!token,
+    staleTime: 1000 * 30, // 30s
+    cacheTime: 1000 * 60 * 5, // 5min
+  });
+
   const invalidateStats = () => {
     queryClient.invalidateQueries({ queryKey: ["dailyStats"] });
     queryClient.invalidateQueries({ queryKey: ["weeklyStats"] });
@@ -40,14 +28,6 @@ export function useHabits() {
     queryClient.invalidateQueries({ queryKey: ["streak"] });
   };
 
-  // Lista de hábitos
-  const { data: habits = [], isLoading } = useQuery({
-    queryKey: ["habits"],
-    queryFn: () => getHabits(token!),
-    enabled: !!token,
-  });
-
-  // Criar hábito
   const createHabit = useMutation({
     mutationFn: (habit: NewHabit) => createHabitApi(habit, token!),
     onSuccess: () => {
@@ -56,7 +36,6 @@ export function useHabits() {
     },
   });
 
-  // Excluir hábito
   const deleteHabit = useMutation({
     mutationFn: (id: string) => deleteHabitApi(id, token!),
     onSuccess: () => {
@@ -65,19 +44,21 @@ export function useHabits() {
     },
   });
 
-  // Alternar hábito do dia
   const toggle = useMutation({
     mutationFn: (id: string) => toggleHabitLog(id, token!),
-    onSuccess: (updated) => {
-      // Atualiza cache local de habits
-      queryClient.setQueryData<Habit[]>(["habits"], (old) =>
-        old ? old.map((h) => (h.id === updated.habit.id ? updated.habit : h)) : []
-      );
-
-      // Atualiza cache local do dailyStats com a resposta da API
-      queryClient.setQueryData(["dailyStats"], updated.stats);
-
-      // Atualiza todos os outros stats
+    onSuccess: (resp: ToggleResponse) => {
+      if (resp?.habit) {
+        // Atualiza cache com hábito atualizado
+        queryClient.setQueryData<Habit[]>(["habits"], (old) =>
+          old ? old.map((h) => (h.id === resp.habit.id ? resp.habit : h)) : [resp.habit]
+        );
+      }
+      if (resp?.stats) {
+        queryClient.setQueryData(["dailyStats"], resp.stats);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["habits"] });
       invalidateStats();
     },
   });
@@ -90,3 +71,5 @@ export function useHabits() {
     toggle,
   };
 }
+
+export default useHabits;

@@ -1,4 +1,3 @@
-
 import type { NewHabit, Habit, ToggleResponse } from "../hooks/useHabits";
 const API_URL = import.meta.env?.VITE_API_URL as string;
 
@@ -12,17 +11,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
   }
 
   if (!res.ok) {
-    let errorMessage = "Unknown error occurred";
-
-    if (typeof data === "string") {
-      errorMessage = data;
-    } else if (data && typeof data === "object") {
-      errorMessage = data.message || data.error || JSON.stringify(data);
-    } else if (res.statusText) {
-      errorMessage = res.statusText;
-    }
-
-    console.error("API Error:", errorMessage);
+    const errorMessage =
+      typeof data === "string"
+        ? data
+        : data?.message || data?.error || res.statusText || "Erro desconhecido";
     throw new Error(errorMessage);
   }
   return data as T;
@@ -47,11 +39,7 @@ export async function apiFetch<T = any>(
     headers["Authorization"] = `Bearer ${authToken}`;
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
-
+  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
   return handleResponse<T>(res);
 }
 
@@ -72,20 +60,13 @@ export async function registerUser(name: string, email: string, password: string
 
 // ---------------- HABITS ----------------
 export async function getHabits(token?: string): Promise<Habit[]> {
-  const raw = await apiFetch<any[]>("/api/habit", { method: "GET" }, token);
-  return raw.map((h) => ({
-    ...h,
-    todayStatus: Boolean(h.todayStatus),
-  }));
+  return apiFetch<Habit[]>("/api/habit", { method: "GET" }, token);
 }
 
 export async function createHabitApi(habit: NewHabit, token?: string) {
   return apiFetch<Habit>(
     "/api/habit",
-    {
-      method: "POST",
-      body: JSON.stringify(habit),
-    },
+    { method: "POST", body: JSON.stringify(habit) },
     token
   );
 }
@@ -107,11 +88,11 @@ export async function toggleHabitLog(
 
 // ---------------- STATS ----------------
 export async function getDailyStats(token: string) {
-  return apiFetch<{
-    completedToday: number;
-    totalHabits: number;
-    percent: number;
-  }>("/api/stat/daily", { method: "GET" }, token);
+  return apiFetch<{ completedToday: number; totalHabits: number; percent: number }>(
+    "/api/stat/daily",
+    { method: "GET" },
+    token
+  );
 }
 
 export async function getWeeklyStats(token?: string) {

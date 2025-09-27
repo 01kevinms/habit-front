@@ -1,4 +1,4 @@
-// src/pages/Dashboard.tsx
+// pages/Dashboard.tsx
 import { useQuery } from "@tanstack/react-query";
 import {
   getWeeklyStats,
@@ -7,6 +7,7 @@ import {
   getHabits,
 } from "../services/api";
 import { useAuth } from "../services/AuthContext";
+import type { Habit } from "../hooks/useHabits";
 import {
   BarChart,
   Bar,
@@ -40,13 +41,19 @@ export default function Dashboard() {
     enabled: !!token,
   });
 
-  const { data: habits = [] } = useQuery({
+  // aqui forçamos o tipo para Habit[]
+  const { data: habits = [] } = useQuery<Habit[]>({
     queryKey: ["habitsDashboard"],
     queryFn: () => getHabits(token!),
     enabled: !!token,
   });
 
-  const feitosHoje = habits.filter((h) => h.todayStatus).length;
+  const todayKey = new Date().toISOString().split("T")[0];
+
+  const feitosHoje = habits.filter((h) =>
+    Boolean(h.logs?.some((l) => l.dayKey === todayKey && l.status))
+  ).length;
+
   const totalHabitos = habits.length;
 
   return (
@@ -55,22 +62,27 @@ export default function Dashboard() {
         👋 Bem-vindo(a), {user?.name}
       </h1>
 
-      {/* 🔥 Resumo Rápido */}
+      {/* resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
-          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">Hábitos</h3>
+          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
+            Hábitos
+          </h3>
           <p className="text-gray-500 dark:text-gray-400 text-sm">
             {feitosHoje}/{totalHabitos} feitos hoje
           </p>
         </div>
 
         <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
-          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">🔥 Streak</h3>
+          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
+            🔥 Streak
+          </h3>
           {loadingStreak ? (
             <p className="text-gray-400 dark:text-gray-500 text-sm">Carregando...</p>
           ) : streak ? (
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              Atual: <span className="font-semibold">{streak.currentStreak}</span> dias <br />
+              Atual: <span className="font-semibold">{streak.currentStreak}</span>{" "}
+              dias <br />
               Máxima: <span className="font-semibold">{streak.maxStreak}</span> dias
             </p>
           ) : (
@@ -79,7 +91,9 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
-          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">📅 Semana</h3>
+          <h3 className="text-lg font-bold text-gray-700 dark:text-gray-200">
+            📅 Semana
+          </h3>
           {loadingWeekly ? (
             <p className="text-gray-400 dark:text-gray-500 text-sm">Carregando...</p>
           ) : (
@@ -88,8 +102,7 @@ export default function Dashboard() {
               <span className="font-semibold">
                 {weekly.length > 0
                   ? Math.round(
-                      weekly.reduce((acc, d) => acc + d.percent, 0) /
-                        weekly.length
+                      weekly.reduce((acc, d) => acc + d.percent, 0) / weekly.length
                     )
                   : 0}
                 %
@@ -99,7 +112,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* 🔥 Progresso Semanal */}
+      {/* Gráficos (semana / mês) */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Semanal</h2>
         {loadingWeekly ? (
@@ -117,7 +130,6 @@ export default function Dashboard() {
         )}
       </section>
 
-      {/* 🔥 Progresso Mensal */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Mensal</h2>
         {loadingMonthly ? (

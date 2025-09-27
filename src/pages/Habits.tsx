@@ -1,6 +1,8 @@
+// pages/Habits.tsx
 import { useState } from "react";
-import { useHabits, type NewHabit } from "../hooks/useHabits";
+import { useHabits} from "../hooks/useHabits";
 import { motion, AnimatePresence } from "framer-motion";
+import type { NewHabit, Habit } from "../types/typehabits";
 
 export default function Habits() {
   const { habits, isLoading, createHabit, toggle, deleteHabit } = useHabits();
@@ -15,7 +17,7 @@ export default function Habits() {
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return;
+    if (!title.trim()) return;
     const newHabit: NewHabit = { title, description, frequency };
     createHabit.mutate(newHabit);
     setTitle("");
@@ -78,55 +80,59 @@ export default function Habits() {
         </form>
       </div>
 
-      {/* Lista */}
+      {/* Lista de hábitos */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {habits.map((habit) => (
-          <motion.div
-            key={habit.id}
-            className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 flex flex-col justify-between"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 200 }}
-          >
-            <div>
-              <h3 className="text-lg font-bold mb-2">{habit.title}</h3>
-              {habit.description && (
-                <p className="text-gray-600 dark:text-gray-400 mb-2">
-                  {habit.description}
-                </p>
-              )}
-              <span
-                className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ${frequencyColor(
-                  habit.frequency
-                )}`}
+        {habits.map((habit: Habit) => {
+          const doneToday = habit.todayStatus ?? false;
+
+          return (
+            <motion.div
+              key={habit.id}
+              className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 flex flex-col justify-between"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <div>
+                <h3 className="text-lg font-bold mb-2">{habit.title}</h3>
+                {habit.description && (
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    {habit.description}
+                  </p>
+                )}
+                <span
+                  className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ${frequencyColor(
+                    habit.frequency
+                  )}`}
+                >
+                  {habit.frequency}
+                </span>
+              </div>
+
+              {/* Botão marcar/feito */}
+              <button
+                onClick={() => toggle.mutate(habit.id)}
+                className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
+                  doneToday
+                    ? "bg-green-500 hover:bg-green-600"
+                    : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400"
+                }`}
               >
-                {habit.frequency}
-              </span>
-            </div>
+                {doneToday ? "Feito" : "Marcar"}
+              </button>
 
-            {/* Botão de marcar feito */}
-            <button
-              onClick={() => toggle.mutate(habit.id)}
-              className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
-                habit.todayStatus
-                  ? "bg-green-500 hover:bg-green-600"
-                  : "bg-blue-500 hover:bg-blue-600"
-              }`}
-            >
-              {habit.todayStatus ? "Feito" : "Marcar"}
-            </button>
-
-            {/* Botão excluir */}
-            <button
-              onClick={() => setHabitToDelete(habit.id)}
-              className="mt-2 px-3 py-1 rounded text-sm bg-red-500 text-white hover:bg-red-600"
-            >
-              Excluir
-            </button>
-          </motion.div>
-        ))}
+              {/* Botão excluir */}
+              <button
+                onClick={() => setHabitToDelete(habit.id)}
+                className="mt-2 px-3 py-1 rounded text-sm bg-red-500 text-white hover:bg-red-600"
+              >
+                Excluir
+              </button>
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Modal */}
+      {/* Modal de confirmação */}
       <AnimatePresence>
         {habitToDelete && (
           <motion.div
@@ -152,8 +158,10 @@ export default function Habits() {
                 </button>
                 <button
                   onClick={() => {
-                    deleteHabit.mutate(habitToDelete);
-                    setHabitToDelete(null);
+                    if (habitToDelete) {
+                      deleteHabit.mutate(habitToDelete);
+                      setHabitToDelete(null);
+                    }
                   }}
                   className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white"
                 >
