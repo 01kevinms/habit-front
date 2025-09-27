@@ -1,28 +1,12 @@
 import { useTheme } from "./AuthTheme";
 
 export function ThemeToggle() {
-  const { theme, toggleTheme, isSystemTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
-  const getThemeIcon = () => {
-    if (isSystemTheme) {
-      return "🖥️"; // Computer icon for system theme
-    }
-    return theme === "dark" ? "☀️" : "🌙";
-  };
-
-  const getThemeLabel = () => {
-    if (isSystemTheme) {
-      return `System (${theme})`;
-    }
-    return theme === "dark" ? "Light" : "Dark";
-  };
-
-  const getTooltip = () => {
-    if (isSystemTheme) {
-      return `Currently following system preference (${theme}). Click to set manual theme.`;
-    }
-    return `Switch to ${theme === "dark" ? "light" : "dark"} mode`;
-  };
+  const getThemeIcon = () => (theme === "dark" ? "☀️" : "🌙");
+  const getThemeLabel = () => (theme === "dark" ? "Light" : "Dark");
+  const getTooltip = () =>
+    `Switch to ${theme === "dark" ? "light" : "dark"} mode`;
 
   return (
     <button
@@ -31,17 +15,8 @@ export function ThemeToggle() {
       title={getTooltip()}
       aria-label={getTooltip()}
     >
-      <span className="text-lg">
-        {getThemeIcon()}
-      </span>
-      <span className="text-sm font-medium">
-        {getThemeLabel()}
-      </span>
-      {isSystemTheme && (
-        <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 rounded-full">
-          Auto
-        </span>
-      )}
+      <span className="text-lg">{getThemeIcon()}</span>
+      <span className="text-sm font-medium">{getThemeLabel()}</span>
     </button>
   );
 }

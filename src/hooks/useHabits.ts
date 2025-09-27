@@ -12,14 +12,16 @@ export function useHabits() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
-  // Busca hábitos (usa todayStatus direto do backend)
-  const { data: habits = [], isLoading } = useQuery<Habit[]>({
+  // Busca hábitos
+  const { data, isLoading } = useQuery<Habit[]>({
     queryKey: ["habits"],
     queryFn: () => getHabits(token!),
     enabled: !!token,
-    staleTime: 1000 * 30, // 30s
-    cacheTime: 1000 * 60 * 5, // 5min
+    staleTime: 1000 * 30,
+    gcTime: 1000 * 60 * 5,
   });
+
+  const habits = data ?? []; // ✅ sempre array
 
   const invalidateStats = () => {
     queryClient.invalidateQueries({ queryKey: ["dailyStats"] });
@@ -48,7 +50,6 @@ export function useHabits() {
     mutationFn: (id: string) => toggleHabitLog(id, token!),
     onSuccess: (resp: ToggleResponse) => {
       if (resp?.habit) {
-        // Atualiza cache com hábito atualizado
         queryClient.setQueryData<Habit[]>(["habits"], (old) =>
           old ? old.map((h) => (h.id === resp.habit.id ? resp.habit : h)) : [resp.habit]
         );

@@ -18,14 +18,19 @@ export const useTheme = () => {
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>("light");
 
+  // Carregar do localStorage
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
     if (saved) {
       setTheme(saved);
       document.documentElement.classList.toggle("dark", saved === "dark");
+    } else {
+      // fallback: usa claro como padrão
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 
+  // Função de alternar tema
   const toggleTheme = () => {
     const newTheme: Theme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);

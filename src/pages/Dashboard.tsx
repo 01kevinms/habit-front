@@ -7,7 +7,7 @@ import {
   getHabits,
 } from "../services/api";
 import { useAuth } from "../services/AuthContext";
-import type { Habit } from "../hooks/useHabits";
+import type { Habit } from "../types/typehabits";
 import {
   BarChart,
   Bar,

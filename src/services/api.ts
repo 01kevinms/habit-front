@@ -1,4 +1,4 @@
-import type { NewHabit, Habit, ToggleResponse } from "../hooks/useHabits";
+import type { NewHabit, Habit, ToggleResponse } from "../types/typehabits";
 const API_URL = import.meta.env?.VITE_API_URL as string;
 
 async function handleResponse<T>(res: Response): Promise<T> {
