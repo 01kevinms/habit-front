@@ -3,26 +3,32 @@ import { Outlet, useNavigate, Link } from "react-router-dom";
 import { Home, User, Settings, ListTodo, Menu } from "lucide-react";
 import { useAuth } from "../services/AuthContext";
 
+// Componente de layout do Dashboard
+// Inclui sidebar (menu lateral), header e área de conteúdo dinâmico
 export default function DashboardLayout() {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { logout } = useAuth(); // função de logout
+  const navigate = useNavigate(); // navegação programática
+  const [sidebarOpen, setSidebarOpen] = useState(true); // controla se a sidebar está aberta
 
+  // Função chamada ao clicar em "Logout"
   const handleLogout = () => {
-    logout();
-    navigate("/login");
+    logout();          // remove dados de autenticação
+    navigate("/login"); // redireciona para tela de login
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
-      {/* Sidebar */}
+      {/* -------------------- SIDEBAR -------------------- */}
       {sidebarOpen && (
         <aside className="w-64 bg-white dark:bg-gray-800 shadow-lg flex flex-col transition-colors">
+          {/* Cabeçalho da sidebar (logo/título) */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
               Meu App
             </h1>
           </div>
+
+          {/* Navegação lateral */}
           <nav className="flex-1 p-4 space-y-2">
             <Link
               to="/dashboard"
@@ -53,6 +59,8 @@ export default function DashboardLayout() {
               Configurações
             </Link>
           </nav>
+
+          {/* Botão de logout */}
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={handleLogout}
@@ -64,11 +72,12 @@ export default function DashboardLayout() {
         </aside>
       )}
 
-      {/* content */}
+      {/* -------------------- CONTEÚDO -------------------- */}
       <div className="flex-1 flex flex-col">
+        {/* Header superior */}
         <header className="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center transition-colors">
           <div className="flex items-center gap-4">
-            {/* toggle button sidebar */}
+            {/* Botão para alternar visibilidade da sidebar */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white transition"
@@ -79,11 +88,14 @@ export default function DashboardLayout() {
               Dashboard
             </h2>
           </div>
+
+          {/* Mensagem de boas-vindas */}
           <span className="text-gray-500 dark:text-gray-300">
             Bem-vindo 👋
           </span>
         </header>
 
+        {/* Área de conteúdo principal (renderiza rotas filhas) */}
         <main className="flex-1 p-6 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
           <Outlet />
         </main>

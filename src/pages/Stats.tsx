@@ -18,27 +18,32 @@ import {
   Line,
 } from "recharts";
 
+// Página de estatísticas de hábitos
 export default function Stats() {
-  const { token } = useAuth();
+  const { token } = useAuth(); // token do usuário para autenticação nas requisições
 
+  // Consulta dados diários
   const { data: daily } = useQuery({
     queryKey: ["dailyStats"],
     queryFn: () => getDailyStats(token!),
-    enabled: !!token,
+    enabled: !!token, // só executa se existir token
   });
 
+  // Consulta dados semanais
   const { data: weekly = [] } = useQuery({
     queryKey: ["weeklyStats"],
     queryFn: () => getWeeklyStats(token!),
     enabled: !!token,
   });
 
+  // Consulta dados mensais
   const { data: monthly = [] } = useQuery({
     queryKey: ["monthlyStats"],
     queryFn: () => getMonthlyStats(token!),
     enabled: !!token,
   });
 
+  // Consulta streaks
   const { data: streak } = useQuery({
     queryKey: ["streak"],
     queryFn: () => getStreak(token!),
@@ -49,7 +54,7 @@ export default function Stats() {
     <div className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 dark:text-gray-200 min-h-screen">
       <h1 className="text-3xl font-bold text-center">📊 Status dos Hábitos</h1>
 
-      {/* Progresso Diário */}
+      {/* -------------------- Progresso Diário -------------------- */}
       {daily && (
         <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
           <h2 className="text-xl font-semibold mb-4">Progresso Diário</h2>
@@ -61,7 +66,7 @@ export default function Stats() {
         </section>
       )}
 
-      {/* Progresso Semanal */}
+      {/* -------------------- Progresso Semanal -------------------- */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Semanal</h2>
         <ResponsiveContainer width="100%" height={250}>
@@ -75,7 +80,7 @@ export default function Stats() {
         </ResponsiveContainer>
       </section>
 
-      {/* Progresso Mensal */}
+      {/* -------------------- Progresso Mensal -------------------- */}
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Mensal</h2>
         <ResponsiveContainer width="100%" height={250}>
@@ -95,7 +100,7 @@ export default function Stats() {
         </ResponsiveContainer>
       </section>
 
-      {/* Streaks */}
+      {/* -------------------- Streaks -------------------- */}
       {streak && (
         <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 text-center">
           <h2 className="text-xl font-semibold mb-4">🔥 Séries (Streaks)</h2>
