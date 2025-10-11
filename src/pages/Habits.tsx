@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useHabits } from "../hooks/useHabits"; 
 import { motion, AnimatePresence } from "framer-motion"; 
-import type { NewHabit, Habit } from "../types/typehabits"; 
+import type { NewHabit, Habit } from "../types/manytypes"; 
 
 // Página de gerenciamento de hábitos
 export default function Habits() { // Componente principal da página
@@ -24,6 +24,7 @@ export default function Habits() { // Componente principal da página
     setTitle(""); // limpa formulário
     setDescription("");
     setFrequency("daily");
+ 
   };
 
   // Exibe mensagem de carregando enquanto busca hábitos

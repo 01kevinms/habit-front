@@ -9,6 +9,8 @@ import Dashboard from "./pages/Dashboard";
 import Stats from "./pages/Stats";
 import Settings from "./pages/Settings";
 import Habits from "./pages/Habits";
+import Diet from "./pages/Diet";
+import { StatusPhisical } from "./pages/StatusPhysical";
 
 
 
@@ -27,6 +29,8 @@ function App() {
                 <Route path="stats" element={<Stats />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="habits" element={<Habits />} />
+                <Route path="diet" element={<Diet />} />
+                <Route path="status" element={<StatusPhisical />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/login" />} />

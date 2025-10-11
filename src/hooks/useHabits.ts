@@ -13,7 +13,7 @@ import {
 import { useAuth } from "../services/AuthContext";
 
 // Tipagens usadas pelo hook
-import type { Habit, NewHabit, ToggleResponse } from "../types/typehabits";
+import type { Habit, NewHabit, ToggleResponse } from "../types/manytypes";
 
 export function useHabits() {
   // Pega o token do contexto de autenticação (necessário para as chamadas protegidas)

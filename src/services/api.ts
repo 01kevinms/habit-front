@@ -1,4 +1,4 @@
-import type { NewHabit, Habit, ToggleResponse } from "../types/typehabits"; 
+import { type NewHabit, type Habit, type ToggleResponse, type Diet, type NewDiet, type NewStatus, type Status, type DietResponse} from "../types/manytypes"; 
 const API_URL = import.meta.env?.VITE_API_URL as string; // Define a URL base da API a partir do arquivo .env
 
 // Função auxiliar que trata a resposta da API
@@ -134,4 +134,66 @@ export async function getStreak(token?: string) { // Token opcional
     { method: "GET" },  // GET
     token // Token
   );
+}
+export async function getDiets(token?: string): Promise<DietResponse> {
+  return apiFetch<DietResponse>("/api/diet", { method: "GET" }, token);
+}
+
+export async function createDietApi(diet: NewDiet, token: string): Promise<DietResponse> {
+  return apiFetch<DietResponse>("/api/diet", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(diet),
+  }, token);
+}
+
+export async function deleteDietApi(id: string, token: string): Promise<{ success: boolean }> {
+  return apiFetch<{ success: boolean }>(`/api/diet/${id}`, {
+    method: "DELETE",
+  }, token);
+}
+
+export async function updateDietApi(id: string, diet: NewDiet, token: string): Promise<Diet> {
+  return apiFetch<Diet>(`/api/diet/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(diet),
+  }, token);
+}
+
+export async function getStatusApi(token?: string): Promise<Status[]> {
+  return apiFetch<Status[]>("/api/status", { method: "GET" }, token);
+}
+
+export async function createStatus(status: NewStatus, token: string): Promise<Status> {
+  return apiFetch<Status>("/api/status", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(status),
+  }, token);
+}
+
+export async function deleteStatusApi(id: string, token: string): Promise<Status> {
+  return apiFetch<Status>(`/api/status/${id}`, { method: "DELETE" }, token);
+}
+
+export async function searchfoodapi(query: string) {
+  const res = await fetch("http://localhost:3001/api/food/nutritionix/search", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Erro ao buscar alimento");
+  }
+
+  return res.json(); // retorna a lista de foods
+}
+export async function deleteFoodApi(id: string, dieId: string, token: string):Promise<{success: boolean}>{
+  return apiFetch<{success: boolean}>(`/api/diet/${dieId}/food/${id}`,{
+    method: "DELETE",
+  },token)
 }

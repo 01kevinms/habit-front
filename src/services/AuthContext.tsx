@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"; 
 import { loginUser, registerUser } from "./api"; 
-import type { AuthContextType, User } from "../types/typehabits";
+import type { AuthContextType, User } from "../types/manytypes";
 
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType); // Cria o contexto com tipagem

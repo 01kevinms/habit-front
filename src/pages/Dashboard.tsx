@@ -6,7 +6,7 @@ import {
   getHabits, 
 } from "../services/api";
 import { useAuth } from "../services/AuthContext"; 
-import type { Habit } from "../types/typehabits"; 
+import type { Habit } from "../types/manytypes"; 
 import {
   BarChart, 
   Bar,

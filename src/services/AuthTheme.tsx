@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react"; // Importa React e hooks
-import type { Theme, ThemeContextType } from "../types/typehabits";
+import type { Theme, ThemeContextType } from "../types/manytypes";
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined); // Cria contexto com valor inicial undefined
 
