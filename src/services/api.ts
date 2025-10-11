@@ -178,7 +178,7 @@ export async function deleteStatusApi(id: string, token: string): Promise<Status
 }
 
 export async function searchfoodapi(query: string) {
-  const res = await fetch("http://localhost:3001/api/food/nutritionix/search", {
+  const res = await fetch("https://habit-back.onrender.com/api/food/nutritionix/search", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
