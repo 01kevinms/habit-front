@@ -53,7 +53,7 @@ const handledeleteFood = (id: string, dietId: string)=>{
       </div>
 
       {/* ===== Cabeçalho da tabela ===== */}
-      <div className="hidden sm:grid sm:grid-cols-6 gap-2 font-bold text-sm border-b border-gray-400 pb-1">
+     <div className="hidden md:grid md:grid-cols-6 gap-2 font-bold text-sm border-b border-gray-400 pb-1">
         <p>Alimento</p>
         <p>Gramas</p>
         <p>Calorias</p>
@@ -66,9 +66,9 @@ const handledeleteFood = (id: string, dietId: string)=>{
         {diet.foods?.map((f) => (
           <div
             key={f.id}
-            className="grid grid-cols-1 sm:grid-cols-6 gap-2 py-2 items-center"
+            className="grid grid-cols-1 md:grid-cols-6 gap-2 py-2 items-center"
           >
-            <div className="gap-2 inline-flex">Alimentos:
+            <div className="gap-2 inline-flex"><span className="md:hidden">Alimentos:</span>
             <p className="truncate grid grid-cols-2">{f.description}</p>
             </div>
 
@@ -88,7 +88,7 @@ const handledeleteFood = (id: string, dietId: string)=>{
                 </>
               ) : (
                 <>
-                  <div className="gap-2 inline-flex">Gramas:
+                  <div className="gap-2 inline-flex"><span className="md:hidden">Gramas:</span>
                     <span>{f.grams} g</span>
                     </div>
                   <button
@@ -104,13 +104,13 @@ const handledeleteFood = (id: string, dietId: string)=>{
             </div>
 
             {/* Colunas numéricas */}
-            <div className="gap-2 inline-flex">Calorias:
+            <div className="gap-2 inline-flex"><span className="md:hidden">Calorias:</span>
             <p >{f.calories.toFixed(1)} kcal</p>
             </div>
-            <div className="gap-2 inline-flex">Proteínas:
+            <div className="gap-2 inline-flex"><span className="md:hidden">Proteinas:</span>
             <p >{f.protein.toFixed(1)}g</p>
             </div>
-            <div className="gap-2 inline-flex">Carboidratos:
+            <div className="gap-2 inline-flex"><span className="md:hidden">Carboidratos</span>
             <p >{f.carbs.toFixed(1)} g</p>
             </div>
 
