@@ -60,7 +60,11 @@ export type Food={
   calories: number
   grams: number
   protein: number
-  carbs: number
+  carbs: number;
+  originalGrams?: number;
+  originalCalories?: number;
+  originalProtein?: number;
+  originalCarbs?: number;
 }
 export type NewFoodForBackend = {
   description: string;
@@ -100,7 +104,19 @@ export interface DietResponse {
   totalCalories: number;
   meta: number;
 }
+export interface DietProgressRequest {
+  goal: number;
+  date?: string;
+}
 
+export interface DietProgress {
+  id?: string;
+  userId?: string;
+  date?: string;
+  calories?: number;
+  goal?: number;
+  achieved?: boolean;
+}
 export interface Status {
   id: string;
   weight: number;

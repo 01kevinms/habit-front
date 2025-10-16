@@ -1,11 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getDiets, createDietApi, deleteDietApi, updateDietApi, apiFetch, deleteFoodApi } from "../services/api";
+import { getDiets, getDietProgress, createDietApi, deleteDietApi, updateDietApi, apiFetch, deleteFoodApi, updateDietProgress } from "../services/api";
 import { useAuth } from "../services/AuthContext";
-import type { DietResponse, Food, NewDiet } from "../types/manytypes";
+import type { DietResponse, NewDiet, NewFoodForBackend } from "../types/manytypes";
+
 
 export function useDiets() {
   const { token } = useAuth();
   const queryClient = useQueryClient();
+
+const { data: dietProgress, isLoading:loadingDiet } = useQuery({
+  queryKey: ["dietProgress", token],
+  queryFn: () => getDietProgress(token!),
+  enabled: !!token,
+});
+
+
+  // Atualiza a meta
+  const updateGoal = useMutation({
+    mutationFn:(goal: number) => updateDietProgress({ goal }, token!),
+    onSuccess: () => { queryClient.invalidateQueries({queryKey:["dietProgress"]});},
+});
 
   // Query para buscar dietas
   const { data, isLoading } = useQuery<DietResponse>({
@@ -48,7 +62,7 @@ const deleteFood = useMutation({
   });
 
 const addNewFoodToDiet = useMutation({
-  mutationFn: async ({ dietId, food }: { dietId: string; food: Omit<Food, "id"> }) =>
+  mutationFn: async ({ dietId, food }: { dietId: string; food: Omit<NewFoodForBackend, "id"> }) =>
     apiFetch(`/api/diet/${dietId}/food`, {
       method: "POST",
       body: JSON.stringify(food),
@@ -70,5 +84,8 @@ const addNewFoodToDiet = useMutation({
     updateDiet,
     updateFood,
     addNewFoodToDiet,
+   dietProgress,
+   loadingDiet,
+   updateGoal
   };
 }

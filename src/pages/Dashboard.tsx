@@ -1,56 +1,14 @@
-import { useQuery } from "@tanstack/react-query"; 
-import {
-  getWeeklyStats,
-  getMonthlyStats, 
-  getStreak,
-  getHabits, 
-} from "../services/api";
+import { useDashboard } from "../hooks/useDashboard";
+import { useDiets } from "../hooks/useDiet";
 import { useAuth } from "../services/AuthContext"; 
-import type { Habit } from "../types/manytypes"; 
-import {
-  BarChart, 
-  Bar,
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  ResponsiveContainer, 
-  CartesianGrid,
-  LineChart, 
-  Line, 
-} from "recharts";
+import {BarChart,Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,LineChart, Line, } from "recharts";
 
-// Página de dashboard principal
 export default function Dashboard() {
-  const { token, user } = useAuth(); // Obtém token e dados do usuário autenticado
-
+  const { user } = useAuth(); // Obtém token e dados do usuário autenticado
+  const { dietProgress,loadingDiet,data } = useDiets();
   // Busca estatísticas semanais
-  const { data: weekly = [], isLoading: loadingWeekly } = useQuery({
-    queryKey: ["weeklyStats"], // chave única do cache
-    queryFn: () => getWeeklyStats(token!), // função que busca dados
-    enabled: !!token, // só executa se houver token
-  });
-
-  // Busca estatísticas mensais
-  const { data: monthly = [], isLoading: loadingMonthly } = useQuery({
-    queryKey: ["monthlyStats"],
-    queryFn: () => getMonthlyStats(token!),
-    enabled: !!token,
-  });
-
-  // Busca estatísticas de streak (dias seguidos)
-  const { data: streak, isLoading: loadingStreak } = useQuery({
-    queryKey: ["streak"],
-    queryFn: () => getStreak(token!),
-    enabled: !!token,
-  });
-
-  // Busca hábitos cadastrados
-  const { data: habits = [] } = useQuery<Habit[]>({
-    queryKey: ["habitsDashboard"],
-    queryFn: () => getHabits(token!),
-    enabled: !!token,
-  });
-
+  const {weekly, monthly,streak,loadingStreak, habits, loadingWeekly, loadingMonthly} = useDashboard()
+  
   // Chave do dia atual no formato YYYY-MM-DD
   const todayKey = new Date().toISOString().split("T")[0]; // pega só a data
 
@@ -61,7 +19,12 @@ export default function Dashboard() {
 
   // Quantidade total de hábitos
   const totalHabitos = habits.length;
+   if (loadingDiet) return <p>Carregando progresso...</p>;
 
+const today = dietProgress?.today;
+const percentage = today ? today.percentage : 0;
+const meta = data?.meta ?? 0
+const weekmeta = (meta * 7).toFixed(1)
   return (
     <div className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 dark:text-gray-200 min-h-screen">
       {/* Saudação com o nome do usuário */}
@@ -120,9 +83,36 @@ export default function Dashboard() {
             </p>
           )}
         </div>
-      </div>
+    <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 text-center">
+      <h2 className="text-xl font-bold mb-2">Progresso da dieta</h2>
+      {today ? (
+        <>
+          <p>Meta Semanal: {weekmeta} kcal</p>
+          <p>Consumido: {today.calories.toFixed(2)} kcal</p>
+          <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
+            <div
+              className={`h-4 rounded-full ${
+                today.achieved ? "bg-green-500" : "bg-blue-500"
+              }`}
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+          <p className="text-md text-gray-400 mt-1">
+            {today.achieved ? "Meta atingida! 🎉" : "Continue firme 💪"}
+          </p>
+          <p>
+  {today.percentage.toFixed(1)}% da meta de {weekmeta} kcal
+</p>
 
+        </>
+      ) : (
+        <p>Nenhum dado ainda</p>
+      )}
+    </div>
+      </div>
       {/* -------------------- Gráfico Semanal -------------------- */}
+      <div className="gap-3 grid">
+        <h2 className="text-xl font-semibold mb-4">Estatísticas dos Hábitos</h2>
       <section className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
         <h2 className="text-xl font-semibold mb-4">Progresso Semanal</h2>
         {loadingWeekly ? ( // Mostra carregando
@@ -131,13 +121,14 @@ export default function Dashboard() {
           // ✅ Aqui o ResponsiveContainer tem apenas 1 filho (BarChart)
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weekly}> {/* Gráfico de barras */}
-              <CartesianGrid strokeDasharray="3 3" /> {/* Linhas de grade */}
+              <CartesianGrid strokeDasharray="0.6 0.1" /> {/* Linhas de grade */}
               <XAxis dataKey="day" /> {/* Define eixo X com dias */}
               <YAxis /> {/* Define eixo Y */}
               <Tooltip /> {/* Tooltip ao passar o mouse */}
               <Bar dataKey="percent" fill="#6366f1" radius={[6, 6, 0, 0]} /> {/* Barras */}
             </BarChart>
           </ResponsiveContainer>
+          
         )}
       </section>
 
@@ -150,7 +141,7 @@ export default function Dashboard() {
           // container responsivo
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={monthly}> 
-              <CartesianGrid strokeDasharray="3 3" /> 
+              <CartesianGrid strokeDasharray="0.6 0.1" /> 
               <XAxis dataKey="week" /> 
               <YAxis /> 
               <Tooltip /> 
@@ -165,6 +156,7 @@ export default function Dashboard() {
           </ResponsiveContainer>
         )}
       </section>
+       </div>
     </div>
   );
 }

@@ -27,9 +27,7 @@ function DietLayout({ diets }: { diets: Diet[] }) {
     food: {
       description: food.food_name,
       grams,
-      calories: food.nf_calories,
-      protein: food.nf_protein,
-      carbs: food.nf_total_carbohydrate,
+
     },
   });
 };

@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export default function Diets() {
   const { data, isLoading, createDiet,updateDiet } = useDiets();
 const diets = data?.diets ?? [];
-const totalCalories = data?.totalCalories ?? 0;
+const totalCalories = (data?.totalCalories ?? 0).toFixed(2);
 const meta = data?.meta ?? 0;
 const atingiumeta = data?.atingiumeta ?? false;
 

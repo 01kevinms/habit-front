@@ -1,4 +1,4 @@
-import { type NewHabit, type Habit, type ToggleResponse, type Diet, type NewDiet, type NewStatus, type Status, type DietResponse} from "../types/manytypes"; 
+import { type NewHabit, type Habit, type ToggleResponse, type Diet, type NewDiet, type NewStatus, type Status, type DietResponse, DietProgress} from "../types/manytypes"; 
 const API_URL = import.meta.env?.VITE_API_URL as string; // Define a URL base da API a partir do arquivo .env
 
 // Função auxiliar que trata a resposta da API
@@ -138,7 +138,15 @@ export async function getStreak(token?: string) { // Token opcional
 export async function getDiets(token?: string): Promise<DietResponse> {
   return apiFetch<DietResponse>("/api/diet", { method: "GET" }, token);
 }
-
+export async function getDietProgress(token?: string) {
+  return apiFetch("/api/diet/progress", { method: "GET" }, token);
+}
+export async function updateDietProgress(data:DietProgress,token?:string): Promise<DietProgress[]> {
+  return apiFetch<DietProgress[]>("/api/diet/progress",{
+    method: "POST",
+    body: JSON.stringify(data)
+  }, token)
+}
 export async function createDietApi(diet: NewDiet, token: string): Promise<DietResponse> {
   return apiFetch<DietResponse>("/api/diet", {
     method: "POST",
@@ -178,7 +186,7 @@ export async function deleteStatusApi(id: string, token: string): Promise<Status
 }
 
 export async function searchfoodapi(query: string) {
-  const res = await fetch("https://habit-back.onrender.com/api/food/nutritionix/search", {
+  const res = await fetch("http://localhost:3001/api/food/nutritionix/search", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
