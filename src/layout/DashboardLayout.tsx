@@ -15,7 +15,7 @@ export default function DashboardLayout() {
     logout();          // remove dados de autenticação
     navigate("/login"); // redireciona para tela de login
   };
-
+const handleclick = ()=>setSidebarOpen(false)
   return (
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
       {/* -------------------- SIDEBAR -------------------- */}
@@ -24,7 +24,7 @@ export default function DashboardLayout() {
           {/* Cabeçalho da sidebar (logo/título) */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-              Meu App
+              Meus Habitos
             </h1>
           </div>
 
@@ -33,6 +33,7 @@ export default function DashboardLayout() {
             <Link
               to="/dashboard"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              onClick={handleclick}
             >
               <Home size={20} />
               Início
@@ -40,13 +41,15 @@ export default function DashboardLayout() {
             <Link
               to="/dashboard/stats"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
-            >
+              onClick={handleclick}
+             >
               <User size={20} />
               Estatísticas
             </Link>
             <Link
               to="/dashboard/habits"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              onClick={handleclick}
             >
               <ListTodo size={20} />
               Hábitos
@@ -54,6 +57,7 @@ export default function DashboardLayout() {
                <Link
               to="/dashboard/diet"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              onClick={handleclick}
             >
               <Apple size={20} />
               dieta
@@ -61,6 +65,7 @@ export default function DashboardLayout() {
               <Link
               to="/dashboard/status"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              onClick={handleclick}
             >
               <BicepsFlexed size={20} />
               status fisico
@@ -68,6 +73,7 @@ export default function DashboardLayout() {
             <Link
               to="/dashboard/settings"
               className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              onClick={handleclick}
             >
               <Settings size={20} />
               Configurações

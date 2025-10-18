@@ -8,7 +8,6 @@ export function ListDiets({ diets, onDelete }: ListDietsProps) {
   const { updateFood, deleteFood, isLoading } = useDiets();
   const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
   const [grams, setGrams] = useState<number>(0);
-
   const handleSave = (food: Food, dietId: string) => {
     if (!food?.id) return;
     updateFood.mutate({ dietId: dietId, id: food.id, grams });

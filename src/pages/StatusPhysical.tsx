@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import type { GenereType, NewStatus, Status } from "../types/manytypes";
-import { useStatusPhysical } from "../hooks/useStatus";
+import { useStatusPhysical, useWaterProgress } from "../hooks/useStatus";
 import { Trash } from "lucide-react";
 import Tippy from "@tippyjs/react";
+import { useAuth } from "../services/AuthContext";
 
 export function StatusPhisical() {
+  const { token } = useAuth();
   const { status, isLoading, createStatush, deleteStatus } = useStatusPhysical();
+  const { today } = useWaterProgress(token!);
 
   const [weight, setWeight] = useState<string>("");
   const [height, setHeight] = useState<string>("");
@@ -18,6 +21,7 @@ export function StatusPhisical() {
   const weightNum = parseFloat(weight);
   const heightNum = parseFloat(height);
   const ageNum = parseInt(age);
+
   // Calcula IMC sempre que peso ou altura mudam
   useEffect(() => {
     if (weight && height) {
@@ -29,16 +33,15 @@ export function StatusPhisical() {
   useEffect(() => {
     if (weight && height && age) {
       if (genere === "masculine") {
-        setTmb(66.5 + 13.75 * heightNum + 5.003 * (heightNum * 100) - 6.775 * ageNum);
+        setTmb(66.5 + 13.75 * weightNum + 5.003 * (heightNum * 100) - 6.775 * ageNum);
       } else {
-        setTmb(655.1 + 9.563 * heightNum + 1.85 * (heightNum * 100) - 4.676 * ageNum);
+        setTmb(655.1 + 9.563 * weightNum + 1.85 * (heightNum * 100) - 4.676 * ageNum);
       }
     }
   }, [weight, height, age, genere]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     if (!weight || !height || !age) {
       return alert("Preencha peso, altura e idade antes de criar o status.");
     }
@@ -50,11 +53,11 @@ export function StatusPhisical() {
       age: ageNum,
       genere,
       tmb,
+      water: today?.goal ?? 0, // já pega a meta do dia
     };
 
     createStatush.mutate(newStatus);
-
-    // Reseta campos
+    // Resetar campos
     setWeight("");
     setHeight("");
     setAge("");
@@ -69,47 +72,44 @@ export function StatusPhisical() {
     if (imc < 29.9) return { label: "Sobrepeso", color: "text-yellow-400" };
     return { label: "Obesidade", color: "text-red-400" };
   }
+
   function colorGenere(genere: GenereType) {
     return genere === "masculine" ? "text-blue-400" : "text-pink-400";
   }
 
   return (
-    <div className="flex gap-2 flex-col w-[80%] items-center justify-center mx-auto">
+    <div className="flex flex-col gap-4 w-[80%] mx-auto items-center">
       {/* Formulário */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 w-full">
         <h2 className="text-xl font-bold mb-4">Seu IMC e TMB</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <label htmlFor="peso">Peso (kg)</label>
+          <label>Peso (kg)</label>
           <input
-            id="peso"
             type="number"
-            placeholder="Peso (kg)"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
           />
-          <label htmlFor="altura">Altura (m) Ex: 1.70</label>
+
+          <label>Altura (m)</label>
           <input
-            id="altura"
             type="number"
             step="0.01"
-            placeholder="Altura (m)"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
           />
-          <label htmlFor="idade">Idade</label>
+
+          <label>Idade</label>
           <input
-            id="idade"
             type="number"
-            placeholder="Idade"
             value={age}
             onChange={(e) => setAge(e.target.value)}
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
           />
-          <label htmlFor="genero">Gênero</label>
+
+          <label>Gênero</label>
           <select
-            id="genero"
             value={genere}
             onChange={(e) => setGenere(e.target.value as GenereType)}
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
@@ -117,6 +117,7 @@ export function StatusPhisical() {
             <option value="masculine">Masculino</option>
             <option value="feminine">Feminino</option>
           </select>
+
           <button
             type="submit"
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
@@ -127,7 +128,7 @@ export function StatusPhisical() {
       </div>
 
       {/* Lista de status */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 w-full mx-auto">
+      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 w-full">
         <h2 className="text-xl font-bold mb-4">Meus status</h2>
         {isLoading ? (
           <p>Carregando...</p>
@@ -140,23 +141,23 @@ export function StatusPhisical() {
               return (
                 <li
                   key={statu.id}
-                  className="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 py-2"
+                  className="flex justify-between items-end border-b border-gray-200 dark:border-gray-600 py-2 lg:items-center"
                 >
-                  <div className="grid grid-cols-7 gap-4">
-                    <p className="font-semibold grid">Idade <span> {statu.age}</span></p>              
-                     <p className="grid">Gênero<span className={colorGenere(statu.genere)}> {statu.genere}</span></p>                  
-                    <p className="text-xm text-gray-100 grid">Altura<span>{statu.height.toFixed(2)}</span></p>
-                    <p className="grid">Peso<span>{statu.weight}kg</span></p>
-                    <p className="grid">IMC:<span className={color}>{statu.imc.toFixed(1)}</span><span className={color}>{label}</span>
-                    </p>
-                    <p className="grid">TMB: <span>{statu.tmb.toFixed(0)} kcal</span></p>
-                   <Tippy content="Excluir status">
-                    <button
-                      onClick={() => deleteStatus.mutate(statu.id)}>
-                        <Trash className="w-5 h-5 text-red-500 hover:scale-125 cursor-pointer"/>
-                    </button>
-                        </Tippy>
+                  <div className="inline-block lg:grid lg:grid-cols-8 lg:gap-6">
+                    <p className="lg:grid">Idade: <span>{statu.age}</span></p>
+                    <p className="lg:grid">Gênero: <span className={colorGenere(statu.genere)}>{statu.genere}</span></p>
+                    <p className="lg:grid">Altura: <span>{statu.height.toFixed(2)}</span></p>
+                    <p className="lg:grid">Peso: <span>{statu.weight} kg</span></p>
+                    <p className="lg:grid">IMC: <span className={color}>{statu.imc.toFixed(1)}</span> <span className={color}>{label}</span></p>
+                    <p className="lg:grid">TMB: <span>{statu.tmb.toFixed(0)} kcal</span></p>
+                    <p className="lg:grid">Meta de água: <span className="text-blue-400">{today?.goal ?? 0} ml</span></p>                
                   </div>
+
+                  <Tippy content="Excluir status" placement="top">
+                    <button onClick={() => deleteStatus.mutate(statu.id)}>
+                      <Trash className="w-6 h-6 text-red-500 hover:scale-125 cursor-pointer" />
+                    </button>
+                  </Tippy>
                 </li>
               );
             })}

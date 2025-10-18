@@ -16,7 +16,7 @@ import { StatusPhisical } from "./pages/StatusPhysical";
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider>      
         <BrowserRouter  basename="/habit-front">
           <Routes>      
             {/* routes public */}

@@ -8,12 +8,13 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType); // Cr
 export const AuthProvider = ({ children }: { children: ReactNode }) => { // Provider que envolve a aplicação
   const [token, setToken] = useState<string | null>(null); // Estado para token
   const [user, setUser] = useState<User | null>(null); // Estado para usuário
-
+const [loading, setLoading]= useState(true)
   useEffect(() => { // Executa ao montar componente
     const storedToken = localStorage.getItem("token"); // Busca token no localStorage
     const storedUser = localStorage.getItem("user"); // Busca usuário no localStorage
     if (storedToken) setToken(storedToken); // Se encontrou token, define no estado
     if (storedUser) setUser(JSON.parse(storedUser)); // Se encontrou user, converte JSON e define
+  setLoading(false)
   }, []); // Apenas na montagem
 
   const login = async (email: string, password: string) => { // Função login
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => { // Prov
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, register, logout }}> {/* Contexto expõe valores */}
+    <AuthContext.Provider value={{ token, user, loading, login, register, logout }}> {/* Contexto expõe valores */}
       {children} {/* Renderiza os filhos */}
     </AuthContext.Provider>
   );

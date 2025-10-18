@@ -14,7 +14,6 @@ const { data: dietProgress, isLoading:loadingDiet } = useQuery({
   enabled: !!token,
 });
 
-
   // Atualiza a meta
   const updateGoal = useMutation({
     mutationFn:(goal: number) => updateDietProgress({ goal }, token!),
@@ -86,6 +85,6 @@ const addNewFoodToDiet = useMutation({
     addNewFoodToDiet,
    dietProgress,
    loadingDiet,
-   updateGoal
+   updateGoal,
   };
 }

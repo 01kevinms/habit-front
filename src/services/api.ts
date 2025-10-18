@@ -1,4 +1,4 @@
-import { type NewHabit, type Habit, type ToggleResponse, type Diet, type NewDiet, type NewStatus, type Status, type DietResponse, DietProgress} from "../types/manytypes"; 
+import { type NewHabit, type Habit, type ToggleResponse, type Diet, type NewDiet, type NewStatus, type Status, type DietResponse, DietProgress, waterResponse, WaterProgress} from "../types/manytypes"; 
 const API_URL = import.meta.env?.VITE_API_URL as string; // Define a URL base da API a partir do arquivo .env
 
 // Função auxiliar que trata a resposta da API
@@ -172,7 +172,9 @@ export async function updateDietApi(id: string, diet: NewDiet, token: string): P
 export async function getStatusApi(token?: string): Promise<Status[]> {
   return apiFetch<Status[]>("/api/status", { method: "GET" }, token);
 }
-
+export async function getWaterApi(token?: string): Promise<waterResponse> {
+  return apiFetch<waterResponse>("/api/status/water", { method: "GET" }, token);
+}
 export async function createStatus(status: NewStatus, token: string): Promise<Status> {
   return apiFetch<Status>("/api/status", {
     method: "POST",
@@ -180,13 +182,20 @@ export async function createStatus(status: NewStatus, token: string): Promise<St
     body: JSON.stringify(status),
   }, token);
 }
+export async function updateWaterApi(id: string, water: number, token: string): Promise<WaterProgress> {
+  return apiFetch<WaterProgress>(`/api/status/${id}/water`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({water}),
+  }, token);
+}   
 
 export async function deleteStatusApi(id: string, token: string): Promise<Status> {
   return apiFetch<Status>(`/api/status/${id}`, { method: "DELETE" }, token);
 }
-
+// https://habit-back.onrender.com
 export async function searchfoodapi(query: string) {
-  const res = await fetch("https://habit-back.onrender.com/api/food/nutritionix/search", {
+  const res = await fetch("http://localhost:3001/api/food/nutritionix/search", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
