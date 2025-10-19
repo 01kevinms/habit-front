@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "homepage": "https://usuario.github.io/habit-front",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
