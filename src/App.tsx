@@ -18,7 +18,7 @@ function App() {
   return (
     <AuthProvider>
       
-        <HashRouter basename="/habit-front" >
+        <HashRouter>
           <Routes>      
             {/* routes public */}
             <Route path="/login" element={<Login />} />
