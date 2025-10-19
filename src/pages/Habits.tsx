@@ -44,7 +44,7 @@ export default function Habits() { // Componente principal da página
   return (
     <div className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 dark:text-gray-200 min-h-screen">
       {/* -------------------- Formulário de criação -------------------- */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 w-full mx-auto">
+      <div className="bg-gray-200 dark:bg-gray-800 shadow rounded-xl p-6 w-full mx-auto">
         <h2 className="text-xl font-bold mb-4">Criar novo hábito</h2>
         <form onSubmit={handleCreate} className="space-y-3"> {/* formulário de novo hábito */}
           <input
@@ -94,17 +94,17 @@ export default function Habits() { // Componente principal da página
           return (
             <motion.div
               key={habit.id} // cada card precisa de chave única
-              className="bg-white dark:bg-gray-800 shadow rounded-xl p-3 flex flex-col justify-between"
+              className="bg-gray-200 dark:bg-gray-800 shadow rounded-xl p-3 flex flex-col justify-between"
               whileHover={{ scale: 1.02 }} // animação de hover
               transition={{ type: "spring", stiffness: 200 }} // suavidade da animação
             >
-              <div className="bg-[#2d3861] rounded">
-                <h3 className="text-lg font-bold mb-2 border-b">{habit.title}</h3> {/* título */}
-                <div className="inline-flex border-b w-full place-content-between py-2">
+              <div className="bg-gray-300 dark:bg-[#2d3861] rounded">
+                <h3 className="text-lg font-bold mb-2 border-b px-2">{habit.title}</h3> {/* título */}
+                <div className="inline-flex border-b rounded w-full px-2 place-content-between py-2">
                   <div className="">
-                  <p className="text-xs text-gray-400/80">Descrição</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-200/60">Descrição</p>
                 {habit.description && ( // descrição só se existir
-                  <p className="text-gray-600 text-lg dark:text-gray-300 mb-2">
+                  <p className="text-gray-900 text-lg dark:text-gray-300 mb-2">
                     {habit.description}
                   </p>
                 )}
@@ -112,7 +112,7 @@ export default function Habits() { // Componente principal da página
 
                 <div className="grid w-[25%] gap-1">
                 <span className={`flex p-1.5 justify-center rounded text-white text-sm font-semibold ${frequencyColor(habit.frequency)}`}>{habit.frequency}</span>
-                <span className="bg-[#486AD9] rounded p-1 flex justify-center">{habit.time}</span>
+                <span className="bg-[#486AD9] text-white rounded p-1 flex justify-center">{habit.time}</span>
                   </div>
 
               </div>                
@@ -124,7 +124,7 @@ export default function Habits() { // Componente principal da página
                 className={`mt-4 px-4 py-1.5 rounded font-semibold text-white transition-colors ${
                   doneToday
                     ? "bg-green-500 hover:bg-green-600" // já feito → verde
-                    : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400" // não feito → cinza
+                    : "bg-gray-400 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400" // não feito → cinza
                 }`}
               >
                 {doneToday ? "Feito" : "Finalizar"} {/* texto muda */}
