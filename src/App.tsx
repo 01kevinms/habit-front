@@ -18,25 +18,23 @@ function App() {
   return (
     <AuthProvider>
       
-        <HashRouter>
-          <Routes>      
-            {/* routes public */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            {/* routes privates */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<DashboardLayout />}>
-                <Route index element={<Dashboard />} />
-                <Route path="stats" element={<Stats />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="habits" element={<Habits />} />
-                <Route path="diet" element={<Diet />} />
-                <Route path="status" element={<StatusPhisical />} />
-              </Route>
-            </Route>
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
-        </HashRouter>
+     <HashRouter>
+  <Routes>
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route element={<PrivateRoute />}>
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="stats" element={<Stats />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="habits" element={<Habits />} />
+        <Route path="diet" element={<Diet />} />
+        <Route path="status" element={<StatusPhisical />} />
+      </Route>
+    </Route>
+    <Route path="*" element={<Navigate to="/login" />} />
+  </Routes>
+</HashRouter>
     </AuthProvider>
   );
 }

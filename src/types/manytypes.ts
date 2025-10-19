@@ -11,6 +11,7 @@
       export interface Habit {
       id: string;
       title: string;
+      time?: string
       description?: string;
       frequency: "daily" | "weekly" | "monthly";
       logs: HabitLog[];        // nunca undefined, backend sempre envia array (mesmo vazio)

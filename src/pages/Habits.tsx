@@ -11,7 +11,7 @@ export default function Habits() { // Componente principal da página
   const [title, setTitle] = useState(""); // título do hábito
   const [description, setDescription] = useState(""); // descrição opcional
   const [frequency, setFrequency] = useState<"daily" | "weekly" | "monthly">("daily"); // frequência padrão = diário
-
+  const [time, setTime]=useState<string>("")
   // Estado que guarda o ID do hábito a ser excluído (para o modal de confirmação)
   const [habitToDelete, setHabitToDelete] = useState<string | null>(null);
 
@@ -19,10 +19,11 @@ export default function Habits() { // Componente principal da página
   const handleCreate = (e: React.FormEvent) => { // Executada no submit do formulário
     e.preventDefault(); // evita recarregar a página
     if (!title.trim()) return; // valida título vazio
-    const newHabit: NewHabit = { title, description, frequency }; // cria objeto do novo hábito
+    const newHabit: NewHabit = { title, description, frequency, time}; // cria objeto do novo hábito
     createHabit.mutate(newHabit); // chama mutação (requisição para API)
     setTitle(""); // limpa formulário
     setDescription("");
+    setTime("")
     setFrequency("daily");
  
   };
@@ -60,6 +61,13 @@ export default function Habits() { // Componente principal da página
             onChange={(e) => setDescription(e.target.value)} // atualiza estado
             className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
           />
+          <input
+            type="time" // campo descrição
+            placeholder="ate que horario fazer"
+            value={time}
+            onChange={(e) => setTime(e.target.value)} // atualiza estado
+            className="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-700 dark:border-gray-600"
+          />
           <select
             value={frequency}
             onChange={(e) => setFrequency(e.target.value as "daily" | "weekly" | "monthly")} // atualiza frequência
@@ -79,41 +87,47 @@ export default function Habits() { // Componente principal da página
       </div>
 
       {/* -------------------- Lista de hábitos -------------------- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {habits.map((habit: Habit) => { // percorre hábitos
           const doneToday = habit.todayStatus ?? false; // verifica se foi feito hoje
 
           return (
             <motion.div
               key={habit.id} // cada card precisa de chave única
-              className="bg-white dark:bg-gray-800 shadow rounded-xl p-6 flex flex-col justify-between"
+              className="bg-white dark:bg-gray-800 shadow rounded-xl p-3 flex flex-col justify-between"
               whileHover={{ scale: 1.02 }} // animação de hover
               transition={{ type: "spring", stiffness: 200 }} // suavidade da animação
             >
-              <div>
-                <h3 className="text-lg font-bold mb-2">{habit.title}</h3> {/* título */}
+              <div className="bg-[#2d3861] rounded">
+                <h3 className="text-lg font-bold mb-2 border-b">{habit.title}</h3> {/* título */}
+                <div className="inline-flex border-b w-full place-content-between py-2">
+                  <div className="">
+                  <p className="text-xs text-gray-400/80">Descrição</p>
                 {habit.description && ( // descrição só se existir
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  <p className="text-gray-600 text-lg dark:text-gray-300 mb-2">
                     {habit.description}
                   </p>
                 )}
-                <span
-                  className={`inline-block px-2 py-1 rounded text-white text-xs font-semibold ${frequencyColor(habit.frequency)}`} // badge colorido da frequência
-                >
-                  {habit.frequency}
-                </span>
+                </div>
+
+                <div className="grid w-[25%] gap-1">
+                <span className={`flex p-1.5 justify-center rounded text-white text-sm font-semibold ${frequencyColor(habit.frequency)}`}>{habit.frequency}</span>
+                <span className="bg-[#486AD9] rounded p-1 flex justify-center">{habit.time}</span>
+                  </div>
+
+              </div>                
               </div>
 
               {/* Botão marcar como feito/não feito */}
               <button
                 onClick={() => toggle.mutate(habit.id)} // alterna status
-                className={`mt-4 px-4 py-2 rounded font-semibold text-white transition-colors ${
+                className={`mt-4 px-4 py-1.5 rounded font-semibold text-white transition-colors ${
                   doneToday
                     ? "bg-green-500 hover:bg-green-600" // já feito → verde
                     : "bg-gray-300 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-400" // não feito → cinza
                 }`}
               >
-                {doneToday ? "Feito" : "Marcar"} {/* texto muda */}
+                {doneToday ? "Feito" : "Finalizar"} {/* texto muda */}
               </button>
 
               {/* Botão excluir (abre modal de confirmação) */}
